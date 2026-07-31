@@ -16,6 +16,7 @@ export default function Chart() {
         </div>
         <nav className="flex items-center gap-5 font-mono text-xs uppercase tracking-widest text-indigo-soft">
           <Link to="/today" className="hover:text-brass">today</Link>
+          <Link to="/life" className="hover:text-brass">life file</Link>
           <button onClick={logout} className="hover:text-clay">sign out</button>
         </nav>
       </header>

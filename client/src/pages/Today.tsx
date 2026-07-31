@@ -51,6 +51,7 @@ export default function Today() {
         <p className="font-mono text-xs tracking-widest text-brass uppercase">sutra · today</p>
         <nav className="flex items-center gap-5 font-mono text-xs uppercase tracking-widest text-indigo-soft">
           <Link to="/chart" className="hover:text-brass">chart</Link>
+          <Link to="/life" className="hover:text-brass">life file</Link>
           <button onClick={logout} className="hover:text-clay">sign out</button>
         </nav>
       </header>

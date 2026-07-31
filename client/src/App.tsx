@@ -5,6 +5,7 @@ import Register from './pages/Register';
 import Onboarding from './pages/Onboarding';
 import Chart from './pages/Chart';
 import Today from './pages/Today';
+import Life from './pages/Life';
 
 function Loading() {
   return (
@@ -34,6 +35,10 @@ export default function App() {
       <Route
         path="/chart"
         element={!user ? <Navigate to="/login" replace /> : !user.hasChart ? <Navigate to="/onboarding" replace /> : <Chart />}
+      />
+      <Route
+        path="/life"
+        element={!user ? <Navigate to="/login" replace /> : !user.hasChart ? <Navigate to="/onboarding" replace /> : <Life />}
       />
 
       {/* Home routes to the right place based on state. */}

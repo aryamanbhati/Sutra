@@ -7,6 +7,7 @@ import { pingRedis } from './redis.js';
 import { authRouter } from './routes/auth.js';
 import { userRouter } from './routes/user.js';
 import { todayRouter } from './routes/today.js';
+import { lifeRouter } from './routes/life.js';
 import type { HealthResponse } from '@sutra/shared';
 
 const app = express();
@@ -18,6 +19,7 @@ app.use(cookieParser());
 app.use('/api/auth', authRouter);
 app.use('/api', userRouter);
 app.use('/api', todayRouter);
+app.use('/api', lifeRouter);
 
 app.get('/api/health', async (_req, res) => {
   const [db, redis] = await Promise.all([
