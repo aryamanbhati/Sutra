@@ -6,6 +6,7 @@ import Onboarding from './pages/Onboarding';
 import Chart from './pages/Chart';
 import Today from './pages/Today';
 import Life from './pages/Life';
+import Console from './pages/Console';
 
 function Loading() {
   return (
@@ -39,6 +40,10 @@ export default function App() {
       <Route
         path="/life"
         element={!user ? <Navigate to="/login" replace /> : !user.hasChart ? <Navigate to="/onboarding" replace /> : <Life />}
+      />
+      <Route
+        path="/console"
+        element={!user ? <Navigate to="/login" replace /> : !user.hasChart ? <Navigate to="/onboarding" replace /> : <Console />}
       />
 
       {/* Home routes to the right place based on state. */}

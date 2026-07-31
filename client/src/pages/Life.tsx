@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import type { Mood } from '@sutra/shared';
 import { api } from '../lib/api';
 import { useAuth } from '../lib/auth';
+import { CorrelationCard } from '../components/CorrelationCard';
 
 type PredStatus = 'open' | 'fulfilled' | 'missed' | 'unclear';
 type EntryType = 'checkin' | 'reading' | 'consultation' | 'prediction';
@@ -73,6 +74,7 @@ export default function Life() {
         <nav className="flex items-center gap-5 font-mono text-xs uppercase tracking-widest text-indigo-soft">
           <Link to="/today" className="hover:text-brass">today</Link>
           <Link to="/chart" className="hover:text-brass">chart</Link>
+          <Link to="/console" className="hover:text-brass">console</Link>
           <button onClick={logout} className="hover:text-clay">sign out</button>
         </nav>
       </header>
@@ -88,6 +90,8 @@ export default function Life() {
           {data.counts.consultations} consultations · {data.counts.predictions} predictions
         </p>
       )}
+
+      <div className="mt-8"><CorrelationCard /></div>
 
       {err && <p className="mt-6 text-clay font-mono">{err}</p>}
       {!data && !err && <p className="mt-6 font-mono text-sm text-indigo-soft">…</p>}

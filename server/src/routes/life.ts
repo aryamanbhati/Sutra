@@ -6,7 +6,9 @@ import { Consultation } from '../models/Consultation.js';
 import { Prediction, PREDICTION_STATUSES } from '../models/Prediction.js';
 import { requireAuth, type AuthedRequest } from '../auth.js';
 import { asyncHandler } from '../util.js';
-import { seedDemoPast } from '../seedHelpers.js';
+import type { NatalChart } from '@sutra/shared';
+import { User } from '../models/User.js';
+import { seedDemoPast, seedDemoCheckIns } from '../seedHelpers.js';
 
 export const lifeRouter = Router();
 
@@ -109,6 +111,11 @@ lifeRouter.post('/predictions/:id/resolve', requireAuth, asyncHandler(async (req
 // Dev/demo utility — conjures the shared past-consultation set for the current user.
 // Idempotent: no-op if the user already has consultations. Also used by Phase 6 seed.
 lifeRouter.post('/dev/conjure-past', requireAuth, asyncHandler(async (req: AuthedRequest, res) => {
-  const result = await seedDemoPast(req.userId!);
-  res.json(result);
+  const user = await User.findById(req.userId);
+  if (!user?.natalChart) { res.status(409).json({ error: 'no_chart' }); return; }
+  const [past, checkIns] = await Promise.all([
+    seedDemoPast(req.userId!),
+    seedDemoCheckIns(req.userId!, user.natalChart as unknown as NatalChart),
+  ]);
+  res.json({ ...past, checkInsCreated: checkIns.created });
 }));

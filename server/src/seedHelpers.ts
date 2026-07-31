@@ -1,7 +1,11 @@
+import type { Types } from 'mongoose';
+import type { NatalChart, Mood } from '@sutra/shared';
 import { Astrologer } from './models/Astrologer.js';
 import { Consultation } from './models/Consultation.js';
 import { Prediction } from './models/Prediction.js';
-import type { Types } from 'mongoose';
+import { CheckIn } from './models/CheckIn.js';
+import { computeTransits } from './astro/transits.js';
+import { SIGNS, wholeSignHouse, signIndex } from './astro/constants.js';
 
 type AstrologerInstance = InstanceType<typeof Astrologer>;
 
@@ -140,4 +144,73 @@ export async function seedDemoPast(userId: Types.ObjectId | string): Promise<{ c
     await consultation.save();
   }
   return { consultations: DEMO_PAST.length, predictions: predictionCount };
+}
+
+// Deliberately concentrated pattern the correlation engine should find:
+// house 8 or 12 → anxious (dark/hidden houses — occult, endings, seclusion)
+// house 4 or 5  → calm (home, rest, expression)
+// house 10 or 11 → energised (visible action, gains)
+// The remaining houses cycle through the non-signal moods, ensuring the
+// concentration lives ONLY in the target houses. Strictly deterministic — no
+// dayIdx-based variation dilutes the signal.
+function moodForMoonHouse(moonHouse: number, dayIdx: number): Mood {
+  if (moonHouse === 8 || moonHouse === 12) return 'anxious';
+  if (moonHouse === 4 || moonHouse === 5) return 'calm';
+  if (moonHouse === 10 || moonHouse === 11) return 'energised';
+  const filler: Mood[] = ['hopeful', 'unsettled', 'low', 'hopeful'];
+  return filler[dayIdx % filler.length];
+}
+
+function dateStr(daysAgo: number): string {
+  const d = new Date();
+  d.setUTCDate(d.getUTCDate() - daysAgo);
+  return d.toISOString().slice(0, 10);
+}
+
+function dateAtNoonUTC(daysAgo: number): Date {
+  const d = new Date();
+  d.setUTCDate(d.getUTCDate() - daysAgo);
+  d.setUTCHours(12, 0, 0, 0);
+  return d;
+}
+
+/**
+ * Seeds 28 days of check-ins with mood deliberately correlated to Moon-in-house
+ * transits. 28 days is one full lunar cycle plus one day, so every sign gets
+ * visited at least twice and the target-house pairs (8&12, 4&5, 10&11) reliably
+ * clear the correlation engine's ≥3 support threshold. Idempotent per (userId,
+ * date). Skips today. Returns count of check-ins created.
+ */
+export async function seedDemoCheckIns(
+  userId: Types.ObjectId | string,
+  natal: NatalChart,
+): Promise<{ created: number }> {
+  const ascIdx = SIGNS.indexOf(natal.ascendant);
+  let created = 0;
+  for (let daysAgo = 28; daysAgo >= 1; daysAgo--) {
+    const at = dateAtNoonUTC(daysAgo);
+    const date = dateStr(daysAgo);
+    const transits = computeTransits(at);
+    const moonHouse = wholeSignHouse(signIndex(transits.planets.find((p) => p.body === 'Moon')!.lon), ascIdx);
+    const mood = moodForMoonHouse(moonHouse, daysAgo);
+    const energy = mood === 'low' || mood === 'anxious' ? 2 : mood === 'energised' ? 5 : 4;
+
+    const result = await CheckIn.updateOne(
+      { userId, date },
+      {
+        $setOnInsert: {
+          userId, date, mood, energy, note: '',
+          transitSnapshot: {
+            moonSign: transits.moonSign,
+            moonNakshatra: transits.moonNakshatra.name,
+            activeAspects: [],
+          },
+          createdAt: at,
+        },
+      },
+      { upsert: true },
+    );
+    if (result.upsertedCount) created++;
+  }
+  return { created };
 }
