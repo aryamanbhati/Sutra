@@ -1,4 +1,11 @@
-import 'dotenv/config';
+import { config } from 'dotenv';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
+
+// Load the repo-root .env regardless of the workspace cwd npm runs us from.
+const here = dirname(fileURLToPath(import.meta.url));
+config({ path: resolve(here, '../../.env') }); // server/src -> repo root
+config(); // also pick up a local .env if present (no-op if none)
 
 function req(name: string, fallback?: string): string {
   const v = process.env[name] ?? fallback;
