@@ -28,8 +28,8 @@ export const env = {
   MONGO_URI: opt('MONGO_URI'),
   UPSTASH_URL: opt('UPSTASH_REDIS_REST_URL'),
   UPSTASH_TOKEN: opt('UPSTASH_REDIS_REST_TOKEN'),
-  // Narrative generation via xAI Grok (OpenAI-compatible API).
-  XAI_API_KEY: opt('XAI_API_KEY'),
-  XAI_MODEL: process.env.XAI_MODEL ?? 'grok-4-fast',
-  XAI_BASE_URL: process.env.XAI_BASE_URL ?? 'https://api.x.ai/v1',
+  // Narrative generation via Groq (OpenAI-compatible API, open models).
+  GROQ_API_KEY: opt('GROQ_API_KEY'),
+  GROQ_MODEL: process.env.GROQ_MODEL ?? 'llama-3.3-70b-versatile',
+  GROQ_BASE_URL: process.env.GROQ_BASE_URL ?? 'https://api.groq.com/openai/v1',
 };

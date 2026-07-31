@@ -10,7 +10,7 @@ export interface GenerationResult {
 /**
  * Grounded daily-reading generation. The model receives ONLY the structured transit
  * features (see prompt.ts) and narrates them. Provider: xAI Grok via its
- * OpenAI-compatible chat-completions endpoint. If no key is set, or the call fails,
+ * chat-completions endpoint (Groq — OpenAI-compatible). If no key is set, or it fails,
  * we fall back to a deterministic template built from the same features — so the app
  * always returns a real, grounded reading.
  */
@@ -18,19 +18,19 @@ export async function generateReading(
   features: TransitFeatures,
   name: string,
 ): Promise<GenerationResult> {
-  if (!env.XAI_API_KEY) {
+  if (!env.GROQ_API_KEY) {
     return { narrative: fallbackNarrative(features, name), model: 'fallback-template' };
   }
 
   try {
-    const res = await fetch(`${env.XAI_BASE_URL}/chat/completions`, {
+    const res = await fetch(`${env.GROQ_BASE_URL}/chat/completions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${env.XAI_API_KEY}`,
+        Authorization: `Bearer ${env.GROQ_API_KEY}`,
       },
       body: JSON.stringify({
-        model: env.XAI_MODEL,
+        model: env.GROQ_MODEL,
         temperature: 0.4, // low: grounded, minimal invention
         max_tokens: 500,
         messages: [
@@ -43,7 +43,7 @@ export async function generateReading(
 
     if (!res.ok) {
       const body = await res.text().catch(() => '');
-      console.error(`[reading] xAI ${res.status}: ${body.slice(0, 200)}`);
+      console.error(`[reading] groq ${res.status}: ${body.slice(0, 200)}`);
       return { narrative: fallbackNarrative(features, name), model: 'fallback-template' };
     }
 
@@ -55,7 +55,7 @@ export async function generateReading(
     if (!text) {
       return { narrative: fallbackNarrative(features, name), model: 'fallback-template' };
     }
-    return { narrative: text, model: data.model ?? env.XAI_MODEL };
+    return { narrative: text, model: data.model ?? env.GROQ_MODEL };
   } catch (e) {
     console.error('[reading] generation failed:', (e as Error).message);
     return { narrative: fallbackNarrative(features, name), model: 'fallback-template' };
