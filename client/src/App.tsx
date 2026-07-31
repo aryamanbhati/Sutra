@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Onboarding from './pages/Onboarding';
 import Chart from './pages/Chart';
+import Today from './pages/Today';
 
 function Loading() {
   return (
@@ -27,6 +28,10 @@ export default function App() {
         element={!user ? <Navigate to="/login" replace /> : user.hasChart ? <Navigate to="/chart" replace /> : <Onboarding />}
       />
       <Route
+        path="/today"
+        element={!user ? <Navigate to="/login" replace /> : !user.hasChart ? <Navigate to="/onboarding" replace /> : <Today />}
+      />
+      <Route
         path="/chart"
         element={!user ? <Navigate to="/login" replace /> : !user.hasChart ? <Navigate to="/onboarding" replace /> : <Chart />}
       />
@@ -35,7 +40,7 @@ export default function App() {
       <Route
         path="*"
         element={
-          <Navigate to={!user ? '/login' : user.hasChart ? '/chart' : '/onboarding'} replace />
+          <Navigate to={!user ? '/login' : user.hasChart ? '/today' : '/onboarding'} replace />
         }
       />
     </Routes>

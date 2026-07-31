@@ -28,6 +28,8 @@ export const env = {
   MONGO_URI: opt('MONGO_URI'),
   UPSTASH_URL: opt('UPSTASH_REDIS_REST_URL'),
   UPSTASH_TOKEN: opt('UPSTASH_REDIS_REST_TOKEN'),
-  ANTHROPIC_API_KEY: opt('ANTHROPIC_API_KEY'),
-  ANTHROPIC_MODEL: process.env.ANTHROPIC_MODEL ?? 'claude-sonnet-4-6',
+  // Narrative generation via xAI Grok (OpenAI-compatible API).
+  XAI_API_KEY: opt('XAI_API_KEY'),
+  XAI_MODEL: process.env.XAI_MODEL ?? 'grok-4-fast',
+  XAI_BASE_URL: process.env.XAI_BASE_URL ?? 'https://api.x.ai/v1',
 };

@@ -29,7 +29,7 @@ export default function Onboarding() {
         }),
       });
       setUser(r.user);
-      nav('/chart');
+      nav('/today');
     } catch {
       setErr('Could not compute your chart. Check the date and time.');
     } finally {

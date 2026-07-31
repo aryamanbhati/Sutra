@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
 import { KundliSquare } from '../components/KundliSquare';
 
@@ -13,9 +14,10 @@ export default function Chart() {
           <p className="font-mono text-xs tracking-widest text-brass uppercase">sutra · natal chart</p>
           <h1 className="mt-2 text-5xl leading-none text-indigo">{user.name}</h1>
         </div>
-        <button onClick={logout} className="font-mono text-xs uppercase tracking-widest text-indigo-soft hover:text-clay">
-          sign out
-        </button>
+        <nav className="flex items-center gap-5 font-mono text-xs uppercase tracking-widest text-indigo-soft">
+          <Link to="/today" className="hover:text-brass">today</Link>
+          <button onClick={logout} className="hover:text-clay">sign out</button>
+        </nav>
       </header>
 
       <p className="mt-3 font-mono text-sm text-indigo-soft">
