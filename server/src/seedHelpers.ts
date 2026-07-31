@@ -4,6 +4,7 @@ import { Astrologer } from './models/Astrologer.js';
 import { Consultation } from './models/Consultation.js';
 import { Prediction } from './models/Prediction.js';
 import { CheckIn } from './models/CheckIn.js';
+import { User } from './models/User.js';
 import { computeTransits } from './astro/transits.js';
 import { SIGNS, wholeSignHouse, signIndex } from './astro/constants.js';
 
@@ -212,5 +213,16 @@ export async function seedDemoCheckIns(
     );
     if (result.upsertedCount) created++;
   }
+
+  // Set the streak to reflect the seeded run. Last check-in is yesterday
+  // (we intentionally skip today so the user's first Today visit is their own
+  // check-in that grows the streak from 28 → 29).
+  if (created > 0) {
+    const lastDate = dateStr(1);
+    await User.findByIdAndUpdate(userId, {
+      streak: { current: created, longest: created, lastCheckInDate: lastDate, freezesRemaining: 2 },
+    });
+  }
+
   return { created };
 }

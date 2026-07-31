@@ -1,7 +1,10 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
 import { ApiError } from '../lib/api';
+
+const DEMO_EMAIL = 'demo@sutra.app';
+const DEMO_PASSWORD = 'demo1234';
 
 export default function Login() {
   const { login } = useAuth();
@@ -10,6 +13,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -25,9 +29,24 @@ export default function Login() {
     }
   }
 
+  async function useDemo() {
+    setEmail(DEMO_EMAIL);
+    setPassword(DEMO_PASSWORD);
+    setErr(null);
+    setBusy(true);
+    try {
+      await login(DEMO_EMAIL, DEMO_PASSWORD);
+      nav('/');
+    } catch {
+      setErr('Demo login unavailable — is the seed populated on this environment?');
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <AuthShell title="Welcome back" subtitle="Pick up the thread.">
-      <form onSubmit={submit} className="space-y-4">
+      <form ref={formRef} onSubmit={submit} className="space-y-4">
         <Field label="Email" type="email" value={email} onChange={setEmail} autoComplete="email" />
         <Field label="Password" type="password" value={password} onChange={setPassword} autoComplete="current-password" />
         {err && <p className="text-clay text-sm font-mono">{err}</p>}
@@ -42,7 +61,7 @@ export default function Login() {
         New here?{' '}
         <Link to="/register" className="text-brass underline underline-offset-2">Create an account</Link>
       </p>
-      <DemoHint />
+      <DemoPanel onUse={useDemo} busy={busy} />
     </AuthShell>
   );
 }
@@ -78,10 +97,27 @@ export function Field({
   );
 }
 
-function DemoHint() {
+function DemoPanel({ onUse, busy }: { onUse: () => void; busy: boolean }) {
   return (
-    <div className="mt-6 border-t border-indigo/10 pt-4 font-mono text-xs text-indigo-soft">
-      <span className="text-brass">demo</span> · seeded account arrives in a later build
+    <div className="mt-6 border-t border-indigo/10 pt-5">
+      <p className="font-mono text-xs uppercase tracking-widest text-brass">
+        demo account
+      </p>
+      <p className="mt-2 text-sm text-indigo">
+        A seeded account with 28 days of check-ins, 3 past consultations, 4 predictions, and a real correlation to read.
+      </p>
+      <dl className="mt-3 grid grid-cols-[80px_1fr] gap-y-1 font-mono text-xs">
+        <dt className="text-indigo-soft">email</dt>
+        <dd className="text-indigo">{DEMO_EMAIL}</dd>
+        <dt className="text-indigo-soft">password</dt>
+        <dd className="text-indigo">{DEMO_PASSWORD}</dd>
+      </dl>
+      <button
+        type="button" onClick={onUse} disabled={busy}
+        className="mt-3 w-full border border-brass text-brass py-2 font-mono text-xs uppercase tracking-widest hover:bg-brass hover:text-paper transition disabled:opacity-50"
+      >
+        {busy ? 'signing in…' : 'sign in as demo'}
+      </button>
     </div>
   );
 }
