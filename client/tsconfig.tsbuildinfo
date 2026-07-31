@@ -1,1 +1,1 @@
-{"root":["./src/app.tsx","./src/main.tsx"],"version":"5.9.3"}
+{"root":["./src/app.tsx","./src/main.tsx","./src/components/kundlisquare.tsx","./src/lib/api.ts","./src/lib/auth.tsx","./src/pages/chart.tsx","./src/pages/login.tsx","./src/pages/onboarding.tsx","./src/pages/register.tsx"],"version":"5.9.3"}

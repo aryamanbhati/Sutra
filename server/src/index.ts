@@ -4,6 +4,8 @@ import cookieParser from 'cookie-parser';
 import { env } from './env.js';
 import { connectMongo, isMongoUp } from './db.js';
 import { pingRedis } from './redis.js';
+import { authRouter } from './routes/auth.js';
+import { userRouter } from './routes/user.js';
 import type { HealthResponse } from '@sutra/shared';
 
 const app = express();
@@ -11,6 +13,9 @@ const app = express();
 app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }));
 app.use(express.json({ limit: '1mb' }));
 app.use(cookieParser());
+
+app.use('/api/auth', authRouter);
+app.use('/api', userRouter);
 
 app.get('/api/health', async (_req, res) => {
   const [db, redis] = await Promise.all([
@@ -29,6 +34,12 @@ app.get('/api/health', async (_req, res) => {
 
 app.get('/', (_req, res) => {
   res.type('text/plain').send('sutra api — see /api/health');
+});
+
+// Backstop error handler — keeps a thrown route from crashing the process.
+app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  console.error('[api] unhandled error:', err.message);
+  if (!res.headersSent) res.status(500).json({ error: 'server_error' });
 });
 
 async function main() {

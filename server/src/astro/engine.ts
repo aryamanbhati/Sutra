@@ -58,7 +58,9 @@ export function computeChartRaw(
   for (const b of horoscope.CelestialBodies.all) {
     bodies[b.key] = {
       lon: normalize360(b.ChartPosition.Ecliptic.DecimalDegrees - ayanamsa),
-      retrograde: b.isRetrograde,
+      // Sun/Moon are never retrograde and the library reports `undefined` for them,
+      // so coerce to a real boolean.
+      retrograde: Boolean(b.isRetrograde),
     };
   }
   // Lunar nodes live under CelestialPoints, not CelestialBodies. They are always
