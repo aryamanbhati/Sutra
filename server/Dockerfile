@@ -8,7 +8,8 @@ RUN npm install --workspaces --include-workspace-root --ignore-scripts
 COPY tsconfig.base.json ./
 COPY shared ./shared
 COPY server ./server
-RUN npm --workspace server run build
+RUN npm --workspace shared run build \
+ && npm --workspace server run build
 
 FROM node:20-alpine
 WORKDIR /app
