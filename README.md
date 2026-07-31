@@ -2,6 +2,15 @@
 
 Persistent-memory astrology platform. Built for AstroHack 2026 (AstroLive Challenge).
 
+### 🔗 Live
+
+| | URL |
+|---|---|
+| **App** | **https://sutra-client.vercel.app** |
+| API health | https://sutra-78qz.onrender.com/api/health |
+
+> Backend runs on Render's free tier and sleeps after 15 min idle — the first request may take ~30–50s to wake.
+
 Thesis: the category loses users to *amnesia* — every consultation starts from zero. Sutra builds a
 single Life File consumed by three surfaces (daily loop, astrologer brief, AI products) so
 continuity creates retention, trust, and margin.
@@ -22,8 +31,8 @@ npm run dev
 Frontend on http://localhost:5173, backend on http://localhost:8080, health at `/api/health`.
 
 ## Deploy
-- Frontend → Vercel
-- Backend → Railway
+- Frontend → Vercel (root dir `client`)
+- Backend → Render (Docker, `server/Dockerfile`)
 - DB → MongoDB Atlas · Cache → Upstash
 
 ## AI tools used
